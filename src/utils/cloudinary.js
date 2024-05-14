@@ -15,7 +15,8 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: "auto"
         })
         // File has been uploaded successfully
-        console.log("File uploaded successfully on cloudinary", response.url);
+        console.log("File uploaded successfully on cloudinary", response.url); // Need to keep it . if not avatr upload failed
+        fs.unlinkSync(localFilePath)
         return response
     } catch (error) {
         fs.unlinkSync(localFilePath) // remove the locally saved temp file as the upload operation got failed

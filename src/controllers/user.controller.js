@@ -27,7 +27,7 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({ // Resolve error by adding
         $or : [{username}, {email}]
     })
     if (existingUser){
@@ -36,7 +36,14 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // express gives us access in request.body, same way multer gives us access for request.files
     const avatarLocalPath = req.files?.avatar[0]?.path; // MUST Checking
-    const coverImageLocalPath = req.files?.coverImage[0]?.path; // OPTIONAL Checking
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path; // OPTIONAL Checking
+
+    // Fix Bug: if cover image is not provided then this process will stil register user
+    let coverImageLocalPath;
+    // Check if files are uploaded, if coverImage array exists, and if it contains at least one file
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path // Assign the path of the first cover image file to coverImageLocalPath
+    }
 
     if (!avatarLocalPath){
         throw new ApiError(400, "Avatar file is required")
@@ -56,7 +63,7 @@ const registerUser = asyncHandler( async (req, res) => {
         coverImage: coverImage?.url || "",
         email,
         password,
-        username: username.toLowerCase()
+        username,
     })
 
     const createdUser = await User.findById(user._id).select(

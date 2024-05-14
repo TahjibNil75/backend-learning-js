@@ -15,6 +15,7 @@ npm i bcrypt
 npm i jsonwebtoken
 npm install cloudinary
 npm i multer
+npm install uuid
 ```
 
 
